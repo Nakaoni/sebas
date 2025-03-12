@@ -48,7 +48,7 @@ func TestRemoveEnv(t *testing.T) {
 }
 
 func TestAddCommand(t *testing.T) {
-	cmd := Command{Cmd: "echo", Args: []string{"Hello", "World"}}
+	cmd := Command{Path: "echo", Args: []string{"Hello", "World"}}
 	expected := &Project{Id: 1, Name: "MyProject", Envs: make([]Env, 0), Cmds: []Command{cmd}}
 
 	project := NewProject("MyProject")
@@ -58,7 +58,7 @@ func TestAddCommand(t *testing.T) {
 }
 
 func TestRemoveCommand(t *testing.T) {
-	cmd := Command{Cmd: "echo", Args: []string{"Hello", "World"}}
+	cmd := Command{Path: "echo", Args: []string{"Hello", "World"}}
 	expected := &Project{Id: 1, Name: "MyProject", Envs: make([]Env, 0), Cmds: make([]Command, 0)}
 
 	project := NewProject("MyProject")
