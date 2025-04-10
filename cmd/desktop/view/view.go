@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -15,9 +14,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 
-	"github.com/e-felix/sebas/internal/command"
-	"github.com/e-felix/sebas/internal/env"
-	"github.com/e-felix/sebas/internal/project"
 	"github.com/e-felix/sebas/internal/util"
 )
 
@@ -27,7 +23,7 @@ const WINDOW_HEIGHT = 728
 const COMMANDS_SECTION_TITLE = "COMMANDS"
 const COMMANDS_MENU_LABEL = "Commands"
 
-func Init() {
+func Render() {
 	my_app := app.New()
 	window := my_app.NewWindow(WINDOW_TITLE)
 	window.Resize(fyne.Size{Width: WINDOW_WIDTH, Height: WINDOW_HEIGHT})
@@ -124,28 +120,6 @@ func Init() {
 
 	window.Show()
 	my_app.Run()
-}
-
-func getProjects() map[string]*project.Project {
-	projects := make(map[string]*project.Project)
-	for i := 1; i <= 3; i++ {
-		new_project := project.NewProject(fmt.Sprintf("Project_%d", i))
-
-		for j := 0; j < 3; j++ {
-			new_project.AddEnv(env.Env{
-				Key:   fmt.Sprintf("ENV_%d", j),
-				Value: fmt.Sprintf("VALUE_%d", j),
-			})
-			new_project.AddCmd(command.Command{
-				Path: "echo",
-				Args: []string{new_project.Name, strconv.Itoa(j)},
-			})
-		}
-
-		projects[new_project.Name] = new_project
-	}
-
-	return projects
 }
 
 func updateWidget(w *widget.Label, msg string) {
