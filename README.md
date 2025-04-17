@@ -55,7 +55,7 @@ in order to target the correct project and the correct env
 make
 ```
 
-or 
+or
 
 ```sh
 make install
@@ -65,4 +65,10 @@ make install
 
 ```sh
 make test
+```
+
+### Launch Desktop application
+
+```sh
+make desktop
 ```

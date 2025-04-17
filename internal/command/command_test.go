@@ -10,23 +10,23 @@ func TestNewCommand(t *testing.T) {
 	cmd := "echo"
 	args := make([]string, 0)
 	args = append(args, "Hello")
-	expected := &Command{Cmd: cmd, Args: args}
+	expected := &Command{Path: cmd, Args: args}
 
 	command := NewCommand(cmd, args)
 
 	Assert.DeepEqual(command, expected)
 }
 
-func TestCommandUpdateCmd(t *testing.T) {
+func TestCommandUpdatePath(t *testing.T) {
 	cmd := "echo"
 	args := make([]string, 0)
 	args = append(args, "Hello")
 
 	newCmd := "ls"
-	expected := &Command{Cmd: newCmd, Args: args}
+	expected := &Command{Path: newCmd, Args: args}
 
-	command := &Command{Cmd: cmd, Args: args}
-	command.UpdateCmd(newCmd)
+	command := &Command{Path: cmd, Args: args}
+	command.UpdatePath(newCmd)
 
 	Assert.DeepEqual(command, expected)
 }
@@ -38,10 +38,24 @@ func TestCommandUpdateArgs(t *testing.T) {
 
 	newArgs := make([]string, 0)
 	newArgs = append(newArgs, "Hi")
-	expected := &Command{Cmd: cmd, Args: newArgs}
+	expected := &Command{Path: cmd, Args: newArgs}
 
-	command := &Command{Cmd: cmd, Args: args}
+	command := &Command{Path: cmd, Args: args}
 	command.UpdateArgs(newArgs)
 
 	Assert.DeepEqual(command, expected)
+}
+
+func TestCommandRun(t *testing.T) {
+	cmd := "echo"
+	args := make([]string, 0)
+	args = append(args, "Hello")
+	expected := "Hello\n"
+
+	ch := make(chan string)
+
+	command := &Command{Path: cmd, Args: args}
+	go command.Run(ch)
+
+	Assert.DeepEqual(<-ch, expected)
 }
