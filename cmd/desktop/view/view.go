@@ -44,7 +44,7 @@ const ENVS_MENU_LABEL = "Envs"
 var app_data AppData
 var app_view AppView
 
-func Init() {
+func Render() {
 	app_view.App = app.New()
 	app_view.Window = app_view.App.NewWindow(WINDOW_TITLE)
 	app_view.Window.Resize(fyne.Size{Width: WINDOW_WIDTH, Height: WINDOW_HEIGHT})
@@ -79,7 +79,7 @@ func Init() {
 		top_right_container,
 	)
 	top_bottom_section := canvas.NewLine(color.White)
-	top_container := container.NewVBox(top_top_section, top_bottom_section)
+	app_view.Top = container.NewVBox(top_top_section, top_bottom_section)
 
 	cmds_menu_button := widget.NewButton(COMMANDS_MENU_LABEL, func() {
 		if app_data.Selected_project == "" {
@@ -137,48 +137,49 @@ func Init() {
 		app_view.Middle.Refresh()
 	})
 
-	envs_menu_button := widget.NewButton(ENVS_MENU_LABEL, func() {
-		if app_data.Selected_project == "" {
-			outputWindow := app_view.App.NewWindow("Warning")
-			output := widget.NewLabel("Please select a project in order to proceed.")
-			outputWindow.SetContent(output)
-			outputWindow.CenterOnScreen()
-			outputWindow.Show()
-			return
-		}
-
-		cmds_container.RemoveAll()
-		cmds_container.RemoveAll()
-		project_cmds_container.RemoveAll()
-		app_view.Middle.RemoveAll()
-
-		envs_section_label := widget.NewLabel(COMMANDS_SECTION_TITLE)
-		envs_section_divider := canvas.NewLine(color.White)
-
-		p, ok := app_data.Projects[app_data.Selected_project]
-		if ok {
-			for _, env := range p.Envs {
-				key_label := widget.NewLabel(env.Key)
-				value_label := widget.NewLabel(env.Value)
-
-				container := container.NewGridWithColumns(2, key_label, value_label)
-				project_cmds_container.Add(container)
-			}
-		}
-
-		cmds_container.Add(envs_section_label)
-		cmds_container.Add(envs_section_divider)
-		cmds_container.Add(project_cmds_container)
-		app_view.Middle.Add(cmds_container)
-		app_view.Middle.Refresh()
-	})
-	left_container := container.NewHBox(container.NewVBox(cmds_menu_button, envs_menu_button), canvas.NewLine(color.White))
+	//envs_menu_button := widget.NewButton(ENVS_MENU_LABEL, func() {
+	//	if app_data.Selected_project == "" {
+	//		outputWindow := app_view.App.NewWindow("Warning")
+	//		output := widget.NewLabel("Please select a project in order to proceed.")
+	//		outputWindow.SetContent(output)
+	//		outputWindow.CenterOnScreen()
+	//		outputWindow.Show()
+	//		return
+	//	}
+	//
+	//	cmds_container.RemoveAll()
+	//	cmds_container.RemoveAll()
+	//	project_cmds_container.RemoveAll()
+	//	app_view.Middle.RemoveAll()
+	//
+	//	envs_section_label := widget.NewLabel(COMMANDS_SECTION_TITLE)
+	//	envs_section_divider := canvas.NewLine(color.White)
+	//
+	//	p, ok := app_data.Projects[app_data.Selected_project]
+	//	if ok {
+	//		for _, env := range p.Envs {
+	//			key_label := widget.NewLabel(env.Key)
+	//			value_label := widget.NewLabel(env.Value)
+	//
+	//			contentContainer := container.NewGridWithColumns(2, key_label, value_label)
+	//			project_cmds_container.Add(contentContainer)
+	//		}
+	//	}
+	//
+	//	cmds_container.Add(envs_section_label)
+	//	cmds_container.Add(envs_section_divider)
+	//	cmds_container.Add(project_cmds_container)
+	//	app_view.Middle.Add(cmds_container)
+	//	app_view.Middle.Refresh()
+	//})
+	//app_view.Left = container.NewHBox(container.NewVBox(cmds_menu_button, envs_menu_button), canvas.NewLine(color.White))
+	app_view.Left = container.NewHBox(container.NewVBox(cmds_menu_button), canvas.NewLine(color.White))
 
 	version_label := widget.NewLabel(fmt.Sprintf("version %v", getCurrentVersion()))
 	version_label.TextStyle.Italic = true
-	bottom_container := container.NewVBox(canvas.NewLine(color.White), container.NewHBox(version_label))
+	app_view.Bottom = container.NewVBox(canvas.NewLine(color.White), container.NewHBox(version_label))
 
-	content := container.NewBorder(top_container, bottom_container, left_container, nil, app_view.Middle)
+	content := container.NewBorder(app_view.Top, app_view.Bottom, app_view.Left, app_view.Right, app_view.Middle)
 
 	app_view.Window.SetContent(content)
 	app_view.Window.SetMaster()

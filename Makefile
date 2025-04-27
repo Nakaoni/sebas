@@ -11,4 +11,4 @@ test: install
 	go test ./...
 
 desktop: install
-	(cd cmd/desktop && go run main.go)
+	(cd cmd/desktop && go run .)
