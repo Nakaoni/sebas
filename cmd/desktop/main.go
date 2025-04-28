@@ -18,7 +18,8 @@ func main() {
 	window := application.NewWindow(APP_TITLE)
 	window.Resize(fyne.Size{Width: WINDOW_WIDTH, Height: WINDOW_HEIGHT})
 
-	window.SetContent(makeUi())
+	ui := &gui{win: window}
+	window.SetContent(ui.makeUi())
 
 	window.Show()
 	application.Run()

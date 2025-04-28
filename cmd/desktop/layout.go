@@ -42,13 +42,16 @@ func (sebasLayout *SebasLayout) Layout(objects []fyne.CanvasObject, size fyne.Si
 	sebasLayout.bottom.Resize(fyne.NewSize(size.Width-SIDE_WIDTH, bottomHeight))
 
 	dividerThickness := theme.SeparatorThicknessSize()
+	// Top divider
 	sebasLayout.dividers[0].Move(fyne.NewPos(0, topHeight))
 	sebasLayout.dividers[0].Resize(fyne.NewSize(size.Width, dividerThickness))
 
-	sebasLayout.dividers[1].Move(fyne.NewPos(sebasLayout.left.MinSize().Width, topHeight))
-	sebasLayout.dividers[1].Resize(fyne.NewSize(dividerThickness, size.Height-topHeight))
+	// Left divider
+	sebasLayout.dividers[1].Move(fyne.NewPos(sebasLayout.left.Size().Width+dividerThickness, topHeight))
+	sebasLayout.dividers[1].Resize(fyne.NewSize(1, size.Height-topHeight))
 
-	sebasLayout.dividers[2].Move(fyne.NewPos(sebasLayout.left.MinSize().Width, size.Height-bottomHeight-dividerThickness))
+	// Bottom divider
+	sebasLayout.dividers[2].Move(fyne.NewPos(sebasLayout.left.Size().Width, size.Height-bottomHeight-dividerThickness))
 	sebasLayout.dividers[2].Resize(fyne.NewSize(size.Width, dividerThickness))
 }
 

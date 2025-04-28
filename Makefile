@@ -1,14 +1,22 @@
 BIN=sebas
+APP_NAME=sebas
 
-.PHONY: install test desktop
+.PHONY: install test gui gui_dbg package
 
-all: install
+all: gui
 
 install:
 	go get ./...
+	go install fyne.io/tools/cmd/fyne@latest
 
 test: install
 	go test ./...
 
-desktop: install
+gui: install
 	(cd cmd/desktop && go run .)
+
+gui_dbg: install
+	(cd cmd/desktop && go run --tags debug .)
+
+package: install
+	(cd cmd/desktop && fyne package)
