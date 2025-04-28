@@ -3,6 +3,7 @@ package main
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/data/binding"
 )
 
 const (
@@ -18,8 +19,9 @@ func main() {
 	window := application.NewWindow(APP_TITLE)
 	window.Resize(fyne.Size{Width: WINDOW_WIDTH, Height: WINDOW_HEIGHT})
 
-	ui := &gui{win: window}
+	ui := &gui{win: window, file: binding.NewString()}
 	window.SetContent(ui.makeUi())
+	window.SetMainMenu(ui.makeMenu())
 
 	window.Show()
 	application.Run()
