@@ -1,12 +1,15 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"github.com/e-felix/sebas/internal/project"
 )
 
 const (
@@ -24,21 +27,35 @@ const (
 )
 
 type gui struct {
-	win  fyne.Window
-	file binding.String
+	win            fyne.Window
+	file           binding.String
+	data           map[string]*project.Project
+	currentProject *project.Project
 }
 
 func (g *gui) makeTopBar() fyne.CanvasObject {
 	title := widget.NewLabel(TOP_BAR_TITLE)
 
-	projectSelect := widget.NewSelect([]string{"Project 1", "Project 2", "Project 3"}, func(selected_value string) {})
+	projectsNameList := make([]string, 0)
+	for k := range g.data {
+		projectsNameList = append(projectsNameList, k)
+	}
+
+	projectSelect := widget.NewSelect(projectsNameList, func(selected_value string) {
+		if g.data[selected_value] == nil {
+			dialog.ShowError(errors.New(fmt.Sprintf("Project %s not found\n", selected_value)), g.win)
+			return
+		}
+
+		g.currentProject = g.data[selected_value]
+	})
 	projectSelect.PlaceHolder = PROJECT_SELECT_PLACEHOLDER
 
 	projectAdd := widget.NewButtonWithIcon(PROJECT_ADD_BUTTON, theme.Icon(theme.IconNameContentAdd), func() {})
 	projectEdit := widget.NewButtonWithIcon(PROJECT_EDIT_BUTTON, theme.Icon(theme.IconNameDocumentCreate), func() {})
 	projectDelete := widget.NewButtonWithIcon(PROJECT_DELETE_BUTTON, theme.Icon(theme.IconNameDelete), func() {})
 
-	return container.NewGridWithColumns(2, title, container.NewHBox(projectAdd, projectEdit, projectDelete, projectSelect))
+	return container.NewGridWithColumns(4, title, container.NewStack(), container.NewStack(), container.NewVBox(container.NewHBox(projectAdd, projectEdit, projectDelete), projectSelect))
 }
 
 func (g *gui) makeUi() fyne.CanvasObject {
