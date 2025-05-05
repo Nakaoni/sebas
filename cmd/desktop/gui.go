@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
@@ -24,6 +25,12 @@ const (
 	PROJECT_ADD_BUTTON    = "Add new"
 	PROJECT_EDIT_BUTTON   = "Edit"
 	PROJECT_DELETE_BUTTON = "Delete"
+
+	// Views
+	COMMAND_VIEW              = "command-view"
+	COMMAND_VIEW_BUTTON_LABEL = "Commands"
+	ENV_VIEW                  = "env-view"
+	ENV_VIEW_BUTTON_LABEL     = "Envs"
 )
 
 type gui struct {
@@ -31,6 +38,7 @@ type gui struct {
 	file           binding.String
 	data           map[string]*project.Project
 	currentProject *project.Project
+	currentView    binding.String
 }
 
 func (g *gui) makeTopBar() fyne.CanvasObject {
@@ -61,9 +69,9 @@ func (g *gui) makeTopBar() fyne.CanvasObject {
 func (g *gui) makeUi() fyne.CanvasObject {
 	top := g.makeTopBar()
 	footer := widget.NewLabel("Footer")
-	leftMenu := widget.NewLabel("Left Menu")
+	leftMenu := g.makeLeftMenu()
 
-	content := widget.NewLabelWithData(g.file)
+	content := widget.NewLabelWithData(g.currentView)
 
 	topDivider := widget.NewSeparator()
 	leftDivider := widget.NewSeparator()
@@ -76,6 +84,16 @@ func (g *gui) makeUi() fyne.CanvasObject {
 
 	objs := []fyne.CanvasObject{top, footer, leftMenu, content, dividers[0], dividers[1], dividers[2]}
 	return container.New(newSebasLayout(top, footer, leftMenu, content, dividers), objs...)
+}
+
+func (g *gui) makeLeftMenu() fyne.CanvasObject {
+	commandViewButton := widget.NewButton(COMMAND_VIEW_BUTTON_LABEL, func() {
+		g.currentView.Set(COMMAND_VIEW)
+	})
+	envViewButton := widget.NewButton(ENV_VIEW_BUTTON_LABEL, func() {
+		g.currentView.Set(ENV_VIEW)
+	})
+	return container.NewVBox(commandViewButton, envViewButton)
 }
 
 func (g *gui) makeMenu() *fyne.MainMenu {
