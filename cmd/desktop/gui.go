@@ -51,6 +51,28 @@ type gui struct {
 	contentView    *fyne.Container
 }
 
+func (g *gui) makeUi() fyne.CanvasObject {
+	top := g.makeTopBar()
+	footer := widget.NewLabel("Footer")
+	leftMenu := g.makeLeftMenu()
+
+	g.contentView = container.NewStack()
+
+	topDivider := widget.NewSeparator()
+	leftDivider := widget.NewSeparator()
+	bottomDivider := widget.NewSeparator()
+	dividers := [3]fyne.CanvasObject{
+		topDivider,
+		leftDivider,
+		bottomDivider,
+	}
+
+	g.setUpViewListener()
+
+	objs := []fyne.CanvasObject{top, footer, leftMenu, g.contentView, dividers[0], dividers[1], dividers[2]}
+	return container.New(newSebasLayout(top, footer, leftMenu, g.contentView, dividers), objs...)
+}
+
 func (g *gui) makeTopBar() fyne.CanvasObject {
 	title := widget.NewLabel(TOP_BAR_TITLE)
 
@@ -73,29 +95,7 @@ func (g *gui) makeTopBar() fyne.CanvasObject {
 	projectEdit := widget.NewButtonWithIcon(PROJECT_EDIT_BUTTON, theme.Icon(theme.IconNameDocumentCreate), func() {})
 	projectDelete := widget.NewButtonWithIcon(PROJECT_DELETE_BUTTON, theme.Icon(theme.IconNameDelete), func() {})
 
-	return container.NewGridWithColumns(4, title, container.NewStack(), container.NewStack(), container.NewVBox(container.NewHBox(projectAdd, projectEdit, projectDelete), projectSelect))
-}
-
-func (g *gui) makeUi() fyne.CanvasObject {
-	top := g.makeTopBar()
-	footer := widget.NewLabel("Footer")
-	leftMenu := g.makeLeftMenu()
-
-	g.contentView = container.NewStack()
-
-	topDivider := widget.NewSeparator()
-	leftDivider := widget.NewSeparator()
-	bottomDivider := widget.NewSeparator()
-	dividers := [3]fyne.CanvasObject{
-		topDivider,
-		leftDivider,
-		bottomDivider,
-	}
-
-	g.setUpViewListener()
-
-	objs := []fyne.CanvasObject{top, footer, leftMenu, g.contentView, dividers[0], dividers[1], dividers[2]}
-	return container.New(newSebasLayout(top, footer, leftMenu, g.contentView, dividers), objs...)
+	return container.NewPadded(container.NewBorder(nil, nil, title, container.NewHBox(projectAdd, projectEdit, projectDelete, projectSelect)))
 }
 
 func (g *gui) setUpViewListener() {
@@ -133,7 +133,7 @@ func (g *gui) makeLeftMenu() fyne.CanvasObject {
 			return
 		}
 	})
-	return container.NewVBox(commandViewButton, envViewButton)
+	return container.NewPadded(container.NewVBox(commandViewButton, envViewButton))
 }
 
 func (g *gui) makeCommandsView() fyne.CanvasObject {
