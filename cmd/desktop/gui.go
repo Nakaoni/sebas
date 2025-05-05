@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"fyne.io/fyne/v2/canvas"
 	"log"
 
 	"fyne.io/fyne/v2"
@@ -138,8 +139,10 @@ func (g *gui) makeLeftMenu() fyne.CanvasObject {
 func (g *gui) makeCommandsView() fyne.CanvasObject {
 	content := container.NewVBox()
 
-	title := widget.NewLabel(COMMAND_VIEW_TITLE)
+	title := canvas.NewText(COMMAND_VIEW_TITLE, theme.Color(theme.ColorNameForeground))
 	title.TextStyle = fyne.TextStyle{Bold: true}
+	title.TextSize = 20
+	title.Alignment = fyne.TextAlignCenter
 
 	content.Add(title)
 	content.Add(widget.NewSeparator())
@@ -169,8 +172,10 @@ func (g *gui) makeCommandsView() fyne.CanvasObject {
 func (g *gui) makeEnvsView() fyne.CanvasObject {
 	content := container.NewVBox()
 
-	title := widget.NewLabel(ENV_VIEW_TITLE)
+	title := canvas.NewText(ENV_VIEW_TITLE, theme.Color(theme.ColorNameForeground))
 	title.TextStyle = fyne.TextStyle{Bold: true}
+	title.TextSize = 20
+	title.Alignment = fyne.TextAlignCenter
 
 	content.Add(title)
 	content.Add(widget.NewSeparator())
