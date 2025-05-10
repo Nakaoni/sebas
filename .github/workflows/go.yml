@@ -14,7 +14,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get install -y libx11-dev
+          sudo apt-get install guix \
+            libx11-dev \
+            libcursor-dev
+          sudo guix install mesa-headers
 
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
