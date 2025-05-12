@@ -5,6 +5,7 @@ package main
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
+	"image/color"
 )
 
 type SebasTheme struct {
@@ -23,4 +24,8 @@ func (sebasTheme *SebasTheme) Size(name fyne.ThemeSizeName) float32 {
 	}
 
 	return sebasTheme.Theme.Size(name)
+}
+
+func (sebasTheme *SebasTheme) Color(c fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color {
+	return sebasTheme.Theme.Color(c, theme.VariantDark)
 }
