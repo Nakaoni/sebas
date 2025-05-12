@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"fyne.io/fyne/v2/canvas"
+	"github.com/e-felix/sebas/cmd/desktop/controller"
 	"log"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -149,18 +151,19 @@ func (g *gui) makeCommandsView() fyne.CanvasObject {
 
 	cmds := g.currentProject.Cmds
 	for _, cmd := range cmds {
-		label := widget.NewLabel(fmt.Sprintf("%s %s", cmd.Path, cmd.Args))
+		currentCmd := cmd
+		label := widget.NewLabel(fmt.Sprintf("%s %s", currentCmd.Path, strings.Join(currentCmd.Args, " ")))
 
 		runButton := widget.NewButton(BUTTON_RUN_LABEL, func() {
-			log.Println("Run command: ", cmd.Path, cmd.Args)
+			log.Println(controller.RunCommand(currentCmd))
 		})
 
 		editButton := widget.NewButton(BUTTON_EDIT_LABEL, func() {
-			log.Println("Edit command: ", cmd.Path, cmd.Args)
+			log.Println("Edit command: ", currentCmd.Path, currentCmd.Args)
 		})
 
 		deleteButton := widget.NewButton(BUTTON_DELETE_LABEL, func() {
-			log.Println("Delete command: ", cmd.Path, cmd.Args)
+			log.Println("Delete command: ", currentCmd.Path, currentCmd.Args)
 		})
 
 		content.Add(container.NewHBox(label, runButton, editButton, deleteButton))
@@ -182,14 +185,15 @@ func (g *gui) makeEnvsView() fyne.CanvasObject {
 
 	envs := g.currentProject.Envs
 	for _, env := range envs {
-		label := widget.NewLabel(fmt.Sprintf("%s %s", env.Key, env.Value))
+		currentEnv := env
+		label := widget.NewLabel(fmt.Sprintf("%s %s", currentEnv.Key, currentEnv.Value))
 
 		editButton := widget.NewButton(BUTTON_EDIT_LABEL, func() {
-			log.Println("Edit command: ", env.Key, env.Value)
+			log.Println("Edit command: ", currentEnv.Key, currentEnv.Value)
 		})
 
 		deleteButton := widget.NewButton(BUTTON_DELETE_LABEL, func() {
-			log.Println("Delete command: ", env.Key, env.Value)
+			log.Println("Delete command: ", currentEnv.Key, currentEnv.Value)
 		})
 
 		content.Add(container.NewHBox(label, editButton, deleteButton))
