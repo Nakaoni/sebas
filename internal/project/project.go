@@ -1,6 +1,7 @@
 package project
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -106,4 +107,23 @@ func (p *Project) RemoveCmd(cmdToRemove Command) bool {
 	p.Cmds = newCmdList
 
 	return true
+}
+
+func (p *Project) EditCmd(editedCmd Command) error {
+	edited := false
+	
+	for _, cmd := range p.Cmds {
+		if reflect.DeepEqual(cmd, editedCmd) {
+			cmd.Path = editedCmd.Path
+			cmd.Args = editedCmd.Args
+			edited = true
+			break
+		}
+	}
+
+	if !edited {
+		return errors.New("Could find matching command to edit")
+	}
+
+	return nil
 }

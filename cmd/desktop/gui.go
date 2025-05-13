@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"fyne.io/fyne/v2/canvas"
-	"github.com/e-felix/sebas/cmd/desktop/controller"
 	"log"
 	"strings"
+
+	"fyne.io/fyne/v2/canvas"
+	"github.com/e-felix/sebas/cmd/desktop/controller"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -186,9 +187,18 @@ func (g *gui) makeCommandsView() fyne.CanvasObject {
 		})
 
 		saveButton = widget.NewButton(BUTTON_SAVE_LABEL, func() {
-			log.Println("Saving command: ", inputCmd.Text, inputArgs.Text)
 			currentCmd.Path = inputCmd.Text
 			currentCmd.Args = strings.Split(inputArgs.Text, " ")
+
+			cmds[currentCmdIndex].Path = currentCmd.Path
+			cmds[currentCmdIndex].Args = currentCmd.Args
+
+			err := controller.EditCommand(*g.currentProject, cmds[currentCmdIndex])
+			if err != nil {
+				log.Println(err)
+			}
+			
+			log.Println(g.data, cmds)
 
 			inputCmd.Disable()
 			inputArgs.Disable()
