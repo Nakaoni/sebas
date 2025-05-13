@@ -21,7 +21,13 @@ func main() {
 	window := application.NewWindow(APP_TITLE)
 	window.Resize(fyne.Size{Width: WINDOW_WIDTH, Height: WINDOW_HEIGHT})
 
-	ui := &gui{win: window, file: binding.NewString(), data: data, currentView: binding.NewString()}
+	ui := &gui{
+		win:                window,
+		file:               binding.NewString(),
+		data:               data,
+		currentView:        binding.NewString(),
+		currentProjectName: binding.NewString(),
+	}
 	window.SetContent(ui.makeUi())
 	//window.SetMainMenu(ui.makeMenu())
 

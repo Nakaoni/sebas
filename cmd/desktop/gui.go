@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"path"
 	"strings"
 
 	"fyne.io/fyne/v2/canvas"
@@ -16,6 +18,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/e-felix/sebas/internal/project"
+	"github.com/e-felix/sebas/internal/util"
 )
 
 const (
@@ -40,6 +43,7 @@ const (
 	ENV_VIEW_BUTTON_LABEL     = "Envs"
 
 	// Button
+	BUTTON_NEW_LABEL    = "New"
 	BUTTON_RUN_LABEL    = "Run"
 	BUTTON_EDIT_LABEL   = "Edit"
 	BUTTON_SAVE_LABEL   = "Save"
@@ -47,17 +51,21 @@ const (
 )
 
 type gui struct {
-	win            fyne.Window
-	file           binding.String
-	data           map[string]*project.Project
-	currentProject *project.Project
-	currentView    binding.String
-	contentView    *fyne.Container
+	win                fyne.Window
+	file               binding.String
+	data               map[string]*project.Project
+	currentProject     *project.Project
+	currentProjectName binding.String
+	currentView        binding.String
+	contentView        *fyne.Container
 }
 
 func (g *gui) makeUi() fyne.CanvasObject {
 	top := g.makeTopBar()
-	footer := widget.NewLabel("Footer")
+
+	footer := widget.NewLabel(getCurrentVersion())
+	footer.TextStyle = fyne.TextStyle{Italic: true}
+
 	leftMenu := g.makeLeftMenu()
 
 	g.contentView = container.NewStack()
@@ -102,6 +110,22 @@ func (g *gui) makeTopBar() fyne.CanvasObject {
 	return container.NewPadded(container.NewBorder(nil, nil, title, container.NewHBox(projectAdd, projectEdit, projectDelete, projectSelect)))
 }
 
+func (g *gui) makeLeftMenu() fyne.CanvasObject {
+	commandViewButton := widget.NewButton(COMMAND_VIEW_BUTTON_LABEL, func() {
+		err := g.currentView.Set(COMMAND_VIEW)
+		if err != nil {
+			return
+		}
+	})
+	envViewButton := widget.NewButton(ENV_VIEW_BUTTON_LABEL, func() {
+		err := g.currentView.Set(ENV_VIEW)
+		if err != nil {
+			return
+		}
+	})
+	return container.NewPadded(container.NewVBox(commandViewButton, envViewButton))
+}
+
 func (g *gui) setUpViewListener() {
 	g.currentView.AddListener(binding.NewDataListener(func() {
 		if g.currentProject == nil {
@@ -126,31 +150,17 @@ func (g *gui) setUpViewListener() {
 	}))
 }
 
-func (g *gui) makeLeftMenu() fyne.CanvasObject {
-	commandViewButton := widget.NewButton(COMMAND_VIEW_BUTTON_LABEL, func() {
-		err := g.currentView.Set(COMMAND_VIEW)
-		if err != nil {
-			return
-		}
-	})
-	envViewButton := widget.NewButton(ENV_VIEW_BUTTON_LABEL, func() {
-		err := g.currentView.Set(ENV_VIEW)
-		if err != nil {
-			return
-		}
-	})
-	return container.NewPadded(container.NewVBox(commandViewButton, envViewButton))
-}
-
 func (g *gui) makeCommandsView() fyne.CanvasObject {
 	content := container.NewVBox()
 
 	title := canvas.NewText(COMMAND_VIEW_TITLE, theme.Color(theme.ColorNameForeground))
 	title.TextStyle = fyne.TextStyle{Bold: true}
-	title.TextSize = 20
-	title.Alignment = fyne.TextAlignCenter
 
-	content.Add(title)
+	newButton := widget.NewButtonWithIcon(BUTTON_NEW_LABEL, theme.ContentAddIcon(), func() {
+		log.Println("New")
+	})
+
+	content.Add(container.NewHBox(title, newButton))
 	content.Add(widget.NewSeparator())
 
 	cmds := g.currentProject.Cmds
@@ -190,15 +200,15 @@ func (g *gui) makeCommandsView() fyne.CanvasObject {
 			currentCmd.Path = inputCmd.Text
 			currentCmd.Args = strings.Split(inputArgs.Text, " ")
 
-			cmds[currentCmdIndex].Path = currentCmd.Path
-			cmds[currentCmdIndex].Args = currentCmd.Args
-
-			err := controller.EditCommand(*g.currentProject, cmds[currentCmdIndex])
+			err := controller.EditCommand(
+				*g.currentProject,
+				cmds[currentCmdIndex],
+				currentCmd.Path,
+				currentCmd.Args,
+			)
 			if err != nil {
 				log.Println(err)
 			}
-			
-			log.Println(g.data, cmds)
 
 			inputCmd.Disable()
 			inputArgs.Disable()
@@ -254,43 +264,54 @@ func (g *gui) makeEnvsView() fyne.CanvasObject {
 	return content
 }
 
-func (g *gui) makeMenu() *fyne.MainMenu {
-	return fyne.NewMainMenu(
-		fyne.NewMenu(
-			FILE_MENU,
-			fyne.NewMenuItem(
-				FILE_MENU_OPEN,
-				func() {
-					g.openFileDialog()
-				},
-			),
-		),
-	)
-}
+// func (g *gui) makeMenu() *fyne.MainMenu {
+// 	return fyne.NewMainMenu(
+// 		fyne.NewMenu(
+// 			FILE_MENU,
+// 			fyne.NewMenuItem(
+// 				FILE_MENU_OPEN,
+// 				func() {
+// 					g.openFileDialog()
+// 				},
+// 			),
+// 		),
+// 	)
+// }
+//
+// func (g *gui) openFileDialog() {
+// 	dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
+// 		if err != nil {
+// 			dialog.ShowError(err, g.win)
+// 			return
+// 		}
+//
+// 		if reader == nil {
+// 			return
+// 		}
+//
+// 		g.openFile(reader)
+// 	}, g.win)
+//
+// }
+//
+// func (g *gui) openFile(reader fyne.URIReadCloser) {
+// 	filename := reader.URI().Name()
+//
+// 	err := g.file.Set(filename)
+//
+// 	if err != nil {
+// 		dialog.ShowError(err, g.win)
+// 		return
+// 	}
+// }
 
-func (g *gui) openFileDialog() {
-	dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
-		if err != nil {
-			dialog.ShowError(err, g.win)
-			return
-		}
-
-		if reader == nil {
-			return
-		}
-
-		g.openFile(reader)
-	}, g.win)
-
-}
-
-func (g *gui) openFile(reader fyne.URIReadCloser) {
-	filename := reader.URI().Name()
-
-	err := g.file.Set(filename)
+func getCurrentVersion() string {
+	cwd, _ := os.Getwd()
+	version, err := util.GetFileContent(path.Join(cwd, "..", "..", "VERSION"))
 
 	if err != nil {
-		dialog.ShowError(err, g.win)
-		return
+		return ""
 	}
+
+	return fmt.Sprintf("Version v%s", version)
 }

@@ -14,6 +14,6 @@ func RunCommand(cmd command.Command) string {
 	return <-ch
 }
 
-func EditCommand(p project.Project, cmd command.Command) error {
-	return p.EditCmd(cmd)
+func EditCommand(p project.Project, cmd command.Command, path string, args []string) error {
+	return p.EditCmd(cmd, path, args)
 }

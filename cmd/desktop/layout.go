@@ -33,10 +33,6 @@ func (sebasLayout *SebasLayout) Layout(objects []fyne.CanvasObject, size fyne.Si
 	sebasLayout.left.Move(fyne.NewPos(0, topHeight))
 	sebasLayout.left.Resize(fyne.NewSize(SIDE_WIDTH, size.Height-topHeight))
 
-	contentHeight := sebasLayout.content.MinSize().Height
-	sebasLayout.content.Move(fyne.NewPos(SIDE_WIDTH, topHeight))
-	sebasLayout.content.Resize(fyne.NewSize(size.Width-SIDE_WIDTH, contentHeight))
-
 	bottomHeight := sebasLayout.bottom.MinSize().Height
 	sebasLayout.bottom.Move(fyne.NewPos(SIDE_WIDTH, size.Height-bottomHeight))
 	sebasLayout.bottom.Resize(fyne.NewSize(size.Width-SIDE_WIDTH, bottomHeight))
@@ -53,6 +49,10 @@ func (sebasLayout *SebasLayout) Layout(objects []fyne.CanvasObject, size fyne.Si
 	// Bottom divider
 	sebasLayout.dividers[2].Move(fyne.NewPos(sebasLayout.left.Size().Width, size.Height-bottomHeight-dividerThickness))
 	sebasLayout.dividers[2].Resize(fyne.NewSize(size.Width, dividerThickness))
+
+	// Content
+	sebasLayout.content.Move(fyne.NewPos(SIDE_WIDTH, topHeight))
+	sebasLayout.content.Resize(fyne.NewSize(size.Width-SIDE_WIDTH, size.Height-topHeight-bottomHeight))
 }
 
 func (sebasLayout *SebasLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {

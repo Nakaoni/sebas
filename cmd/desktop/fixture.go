@@ -15,7 +15,7 @@ func initFixture() map[string]*project.Project {
 	for i := 1; i <= 3; i++ {
 		new_project := project.NewProject(fmt.Sprintf("Project_%d", i))
 
-		for j := 0; j < 3; j++ {
+		for j := 0; j < 10; j++ {
 			new_project.AddEnv(env.Env{
 				Key:   fmt.Sprintf("ENV_%d", j),
 				Value: fmt.Sprintf("VALUE_%d", j),

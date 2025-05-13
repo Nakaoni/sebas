@@ -3,6 +3,7 @@ package project
 import (
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 
 	. "github.com/e-felix/sebas/internal/command"
@@ -109,17 +110,20 @@ func (p *Project) RemoveCmd(cmdToRemove Command) bool {
 	return true
 }
 
-func (p *Project) EditCmd(editedCmd Command) error {
+func (p *Project) EditCmd(cmd Command, path string, args []string) error {
 	edited := false
-	
-	for _, cmd := range p.Cmds {
-		if reflect.DeepEqual(cmd, editedCmd) {
-			cmd.Path = editedCmd.Path
-			cmd.Args = editedCmd.Args
+
+	for i, c := range p.Cmds {
+		if reflect.DeepEqual(c, cmd) {
+			p.Cmds[i].Path = path
+			p.Cmds[i].Args = args
+
 			edited = true
 			break
 		}
 	}
+
+	log.Println("p: ", p.Cmds)
 
 	if !edited {
 		return errors.New("Could find matching command to edit")
@@ -127,3 +131,4 @@ func (p *Project) EditCmd(editedCmd Command) error {
 
 	return nil
 }
+
