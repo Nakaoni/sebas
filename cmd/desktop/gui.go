@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"fyne.io/fyne/v2/canvas"
+	"github.com/e-felix/sebas/cmd/desktop/controller"
 	"log"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -39,6 +41,7 @@ const (
 	// Button
 	BUTTON_RUN_LABEL    = "Run"
 	BUTTON_EDIT_LABEL   = "Edit"
+	BUTTON_SAVE_LABEL   = "Save"
 	BUTTON_DELETE_LABEL = "Delete"
 )
 
@@ -113,10 +116,12 @@ func (g *gui) setUpViewListener() {
 
 		switch view {
 		case COMMAND_VIEW:
-			g.contentView.Add(g.makeCommandsView())
+			g.contentView.Add(container.NewPadded(g.makeCommandsView()))
 		case ENV_VIEW:
 			g.contentView.Add(g.makeEnvsView())
 		}
+
+		g.contentView.Refresh()
 	}))
 }
 
@@ -148,22 +153,62 @@ func (g *gui) makeCommandsView() fyne.CanvasObject {
 	content.Add(widget.NewSeparator())
 
 	cmds := g.currentProject.Cmds
-	for _, cmd := range cmds {
-		label := widget.NewLabel(fmt.Sprintf("%s %s", cmd.Path, cmd.Args))
+	for i, cmd := range cmds {
+		currentCmd := cmd
+
+		currentCmdIndex := i
+
+		currentCmdValue := binding.NewString()
+		_ = currentCmdValue.Set(fmt.Sprintf("%s", currentCmd.Path))
+
+		currentArgsValue := binding.NewString()
+		_ = currentArgsValue.Set(fmt.Sprintf("%s", strings.Join(currentCmd.Args, " ")))
+
+		inputCmd := widget.NewEntryWithData(currentCmdValue)
+		inputArgs := widget.NewEntryWithData(currentArgsValue)
+
+		inputCmd.Disable()
+		inputArgs.Disable()
 
 		runButton := widget.NewButton(BUTTON_RUN_LABEL, func() {
-			log.Println("Run command: ", cmd.Path, cmd.Args)
+			log.Println(controller.RunCommand(currentCmd))
 		})
 
-		editButton := widget.NewButton(BUTTON_EDIT_LABEL, func() {
-			log.Println("Edit command: ", cmd.Path, cmd.Args)
+		var editButton *widget.Button
+		var saveButton *widget.Button
+
+		editButton = widget.NewButton(BUTTON_EDIT_LABEL, func() {
+			inputCmd.Enable()
+			inputArgs.Enable()
+
+			saveButton.Show()
+			editButton.Hide()
 		})
+
+		saveButton = widget.NewButton(BUTTON_SAVE_LABEL, func() {
+			log.Println("Saving command: ", inputCmd.Text, inputArgs.Text)
+			currentCmd.Path = inputCmd.Text
+			currentCmd.Args = strings.Split(inputArgs.Text, " ")
+
+			inputCmd.Disable()
+			inputArgs.Disable()
+
+			saveButton.Hide()
+			editButton.Show()
+		})
+
+		saveButton.Hide()
+		saveAndEditStack := container.NewStack(editButton, saveButton)
 
 		deleteButton := widget.NewButton(BUTTON_DELETE_LABEL, func() {
-			log.Println("Delete command: ", cmd.Path, cmd.Args)
+			log.Println("Delete command: ", currentCmd.Path, currentCmd.Args)
+
+			cmds = append(cmds[:currentCmdIndex], cmds[currentCmdIndex+1:]...)
+			g.currentProject.Cmds = cmds
+			g.setUpViewListener()
 		})
 
-		content.Add(container.NewHBox(label, runButton, editButton, deleteButton))
+		content.Add(container.NewAdaptiveGrid(3, inputCmd, inputArgs, container.NewHBox(runButton, saveAndEditStack, deleteButton)))
 	}
 
 	return content
@@ -182,14 +227,15 @@ func (g *gui) makeEnvsView() fyne.CanvasObject {
 
 	envs := g.currentProject.Envs
 	for _, env := range envs {
-		label := widget.NewLabel(fmt.Sprintf("%s %s", env.Key, env.Value))
+		currentEnv := env
+		label := widget.NewLabel(fmt.Sprintf("%s %s", currentEnv.Key, currentEnv.Value))
 
 		editButton := widget.NewButton(BUTTON_EDIT_LABEL, func() {
-			log.Println("Edit command: ", env.Key, env.Value)
+			log.Println("Edit command: ", currentEnv.Key, currentEnv.Value)
 		})
 
 		deleteButton := widget.NewButton(BUTTON_DELETE_LABEL, func() {
-			log.Println("Delete command: ", env.Key, env.Value)
+			log.Println("Delete command: ", currentEnv.Key, currentEnv.Value)
 		})
 
 		content.Add(container.NewHBox(label, editButton, deleteButton))
