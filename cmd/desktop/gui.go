@@ -11,6 +11,8 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"github.com/e-felix/sebas/cmd/desktop/controller"
 
+	"slices"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/binding"
@@ -35,6 +37,7 @@ const (
 	PROJECT_DELETE_BUTTON = "Delete"
 
 	// Views
+	EMPTY_VIEW                = "empty-view"
 	COMMAND_VIEW              = "command-view"
 	COMMAND_VIEW_TITLE        = "List of Commands"
 	COMMAND_VIEW_BUTTON_LABEL = "Commands"
@@ -144,6 +147,8 @@ func (g *gui) setUpViewListener() {
 			g.contentView.Add(container.NewPadded(g.makeCommandsView()))
 		case ENV_VIEW:
 			g.contentView.Add(g.makeEnvsView())
+		case EMPTY_VIEW:
+			// do nothing -> used to trigger listener
 		}
 
 		g.contentView.Refresh()
@@ -223,9 +228,9 @@ func (g *gui) makeCommandsView() fyne.CanvasObject {
 		deleteButton := widget.NewButton(BUTTON_DELETE_LABEL, func() {
 			log.Println("Delete command: ", currentCmd.Path, currentCmd.Args)
 
-			cmds = append(cmds[:currentCmdIndex], cmds[currentCmdIndex+1:]...)
+			cmds = slices.Delete(cmds, currentCmdIndex, currentCmdIndex+1)
 			g.currentProject.Cmds = cmds
-			g.setUpViewListener()
+			g.refreshCurrentView()
 		})
 
 		content.Add(container.NewAdaptiveGrid(3, inputCmd, inputArgs, container.NewHBox(runButton, saveAndEditStack, deleteButton)))
@@ -314,4 +319,14 @@ func getCurrentVersion() string {
 	}
 
 	return fmt.Sprintf("Version v%s", version)
+}
+
+func (g *gui) refreshCurrentView() {
+	currentView, err := g.currentView.Get()
+	if err != nil {
+		return
+	}
+
+	g.currentView.Set(EMPTY_VIEW)
+	g.currentView.Set(currentView)
 }
