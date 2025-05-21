@@ -91,9 +91,9 @@ func (g *gui) makeUi() fyne.CanvasObject {
 func (g *gui) makeTopBar() fyne.CanvasObject {
 	title := widget.NewLabel(TOP_BAR_TITLE)
 
-	projectsNameList := make([]string, 0)
-	for k := range g.data {
-		projectsNameList = append(projectsNameList, k)
+	projectsNameList := make([]string, len(g.data))
+	for k, p := range g.data {
+		projectsNameList[p.Id-1] = k
 	}
 
 	projectSelect := widget.NewSelect(projectsNameList, func(selected_value string) {
@@ -106,7 +106,9 @@ func (g *gui) makeTopBar() fyne.CanvasObject {
 	})
 	projectSelect.PlaceHolder = PROJECT_SELECT_PLACEHOLDER
 
-	projectAdd := widget.NewButtonWithIcon(PROJECT_ADD_BUTTON, theme.Icon(theme.IconNameContentAdd), func() {})
+	projectAdd := widget.NewButtonWithIcon(PROJECT_ADD_BUTTON, theme.Icon(theme.IconNameContentAdd), func() {
+		g.data = controller.AddProject("newP")
+	})
 	projectEdit := widget.NewButtonWithIcon(PROJECT_EDIT_BUTTON, theme.Icon(theme.IconNameDocumentCreate), func() {})
 	projectDelete := widget.NewButtonWithIcon(PROJECT_DELETE_BUTTON, theme.Icon(theme.IconNameDelete), func() {})
 
