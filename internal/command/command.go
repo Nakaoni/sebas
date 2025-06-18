@@ -1,9 +1,9 @@
 package command
 
 import (
+	"bufio"
 	"context"
 	"fmt"
-	"log"
 	"os/exec"
 	"time"
 )
@@ -34,11 +34,25 @@ func (command *Command) Run(c chan string) {
 
 	cmd := exec.CommandContext(ctx, command.Path, command.Args...)
 
-	out, err := cmd.Output()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Fatal(err)
 		c <- fmt.Sprint(err)
 	}
 
-	c <- string(out)
+	if err := cmd.Start(); err != nil {
+		c <- fmt.Sprint(err)
+	}
+
+	scanner := bufio.NewScanner(stdout)
+	for scanner.Scan() {
+		c <- scanner.Text()
+	}
+
+	if err := scanner.Err(); err != nil {
+		c <- fmt.Sprint(err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		c <- fmt.Sprint(err)
+	}
 }

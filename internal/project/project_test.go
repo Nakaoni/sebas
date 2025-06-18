@@ -67,3 +67,14 @@ func TestRemoveCommand(t *testing.T) {
 
 	Assert.DeepEqual(project, expected)
 }
+
+func TestEditCommand(t *testing.T) {
+	cmd := Command{Path: "echo", Args: []string{"Hello", "World"}}
+	expected := &Project{Id: 1, Name: "MyProject", Envs: make([]Env, 0), Cmds: []Command{Command{Path: "ls", Args: []string{"-la"}}}}
+
+	project := NewProject("MyProject")
+	project.AddCmd(cmd)
+	project.EditCmd(cmd, "ls", []string{"-la"})
+
+	Assert.DeepEqual(project, expected)
+}
