@@ -10,12 +10,14 @@ import (
 type Command struct {
 	Cmd  string
 	Args []string
+	Dir  string
 }
 
 func NewCommand(cmd string, args []string) *Command {
 	return &Command{
 		Cmd:  cmd,
 		Args: args,
+		Dir:  "",
 	}
 }
 
@@ -27,8 +29,17 @@ func (command *Command) UpdateArgs(args []string) {
 	command.Args = args
 }
 
+func (command *Command) UpdateDir(dir string) {
+	command.Dir = dir
+}
+
 func (command *Command) Run(ctx context.Context, output chan string) {
 	cmd := exec.CommandContext(ctx, command.Cmd, command.Args...)
+
+	if command.Dir != "" {
+		cmd.Dir = command.Dir
+	}
+
 	defer close(output)
 
 	stdout, err := cmd.StdoutPipe()
