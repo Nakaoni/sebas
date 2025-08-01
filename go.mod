@@ -1,3 +1,5 @@
-module github.com/e-felix/sebas
+module github.com/nakaoni/sebas
 
 go 1.21.4
+
+require github.com/mattn/go-sqlite3 v1.14.30

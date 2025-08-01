@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/e-felix/sebas/internal/util"
-	Assert "github.com/e-felix/sebas/internal/util/assert"
+	"github.com/nakaoni/sebas/internal/util"
+	Assert "github.com/nakaoni/sebas/internal/util/assert"
 )
 
 var (
