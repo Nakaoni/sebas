@@ -3,9 +3,9 @@ package project
 import (
 	"testing"
 
-	. "github.com/e-felix/sebas/internal/command"
-	. "github.com/e-felix/sebas/internal/env"
-	Assert "github.com/e-felix/sebas/internal/util/assert"
+	. "github.com/nakaoni/sebas/internal/command"
+	. "github.com/nakaoni/sebas/internal/env"
+	Assert "github.com/nakaoni/sebas/internal/util/assert"
 )
 
 func TestNewProject(t *testing.T) {

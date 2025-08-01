@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	. "github.com/e-felix/sebas/internal/command"
-	. "github.com/e-felix/sebas/internal/env"
+	. "github.com/nakaoni/sebas/internal/command"
+	. "github.com/nakaoni/sebas/internal/env"
 )
 
 type Project struct {

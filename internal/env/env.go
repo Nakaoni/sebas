@@ -5,7 +5,7 @@ import (
 	"strings"
 	"text/scanner"
 
-	"github.com/e-felix/sebas/internal/util"
+	"github.com/nakaoni/sebas/internal/util"
 )
 
 type Env struct {
