@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	Assert "github.com/e-felix/sebas/internal/util/assert"
+	Assert "github.com/nakaoni/sebas/internal/util/assert"
 )
 
 func TestNewCommand(t *testing.T) {
